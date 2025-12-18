@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Anonymous Chat</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Username screen -->
+  <div id="login-screen" class="center">
+    <h2>Enter a username</h2>
+    <input type="text" id="usernameInput" placeholder="Username" />
+    <button id="joinBtn">Join Chat</button>
+  </div>
+
+  <!-- Chat screen -->
+  <div id="chat-screen" class="hidden">
+    <div id="chat-header">Live Chat</div>
+
+    <div id="chat-box"></div>
+
+    <div id="chat-input">
+      <input type="text" id="messageInput" placeholder="Type a message..." />
+      <button id="sendBtn">Send</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
