@@ -4,8 +4,8 @@ const WebSocket = require("ws");
 const fs = require("fs");
 const path = require("path");
 
-const PORT = 8080;
-const ADMIN_SECRET = "change_this_password";
+const PORT = process.env.PORT || 8080;
+const ADMIN_SECRET = process.env.ADMIN_SECRET || "";
 
 const app = express();
 
@@ -38,25 +38,34 @@ function saveLog() {
 function broadcast(data) {
   const msg = JSON.stringify(data);
   for (const ws of clients.keys()) {
-    if (ws.readyState === WebSocket.OPEN) ws.send(msg);
+    if (ws.readyState === WebSocket.OPEN) {
+      ws.send(msg);
+    }
   }
 }
 
 wss.on("connection", (ws) => {
   ws.on("message", (msg) => {
     let data;
-    try { data = JSON.parse(msg); } catch { return; }
+    try {
+      data = JSON.parse(msg);
+    } catch {
+      return;
+    }
 
     if (data.type === "join") {
       let username = data.username?.trim();
       if (!username) return ws.close();
 
-      if (data.adminSecret === ADMIN_SECRET) {
+      if (ADMIN_SECRET && data.adminSecret === ADMIN_SECRET) {
         username = "ADMIN";
       }
 
       clients.set(ws, username);
+
+      // Send old messages to newly joined user
       chatLog.forEach(m => ws.send(JSON.stringify(m)));
+
       broadcast({ username: "SYSTEM", message: `${username} joined` });
     }
 
@@ -79,7 +88,9 @@ wss.on("connection", (ws) => {
   ws.on("close", () => {
     const user = clients.get(ws);
     clients.delete(ws);
-    if (user) broadcast({ username: "SYSTEM", message: `${user} left` });
+    if (user) {
+      broadcast({ username: "SYSTEM", message: `${user} left` });
+    }
   });
 });
 
