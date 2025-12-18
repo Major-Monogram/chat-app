@@ -21,8 +21,8 @@ joinBtn.onclick = () => {
 };
 
 function connectWebSocket() {
-  // CHANGE THIS later to your backend WebSocket URL
-  socket = new WebSocket("ws://localhost:8080");
+  const protocol = location.protocol === "https:" ? "wss://" : "ws://";
+  socket = new WebSocket(protocol + location.host);
 
   socket.onopen = () => {
     socket.send(JSON.stringify({
@@ -48,7 +48,7 @@ messageInput.addEventListener("keypress", (e) => {
 
 function sendMessage() {
   const msg = messageInput.value.trim();
-  if (!msg) return;
+  if (!msg || socket.readyState !== WebSocket.OPEN) return;
 
   socket.send(JSON.stringify({
     type: "message",
@@ -64,7 +64,6 @@ function addMessage(user, msg) {
 
   div.innerHTML = `<span class="username">${user}:</span> ${escapeHTML(msg)}`;
   chatBox.appendChild(div);
-
   chatBox.scrollTop = chatBox.scrollHeight;
 }
 
